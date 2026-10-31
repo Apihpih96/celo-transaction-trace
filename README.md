@@ -1,8 +1,12 @@
 # Celo Transaction Trace
 
-A small, dependency-free prototype for inspecting pasted Celo transaction-receipt JSON. It validates a transaction hash, links to the corresponding Blockscout page, and locally decodes receipt metadata and ERC-20 `Transfer` events.
+A small, dependency-free browser tool for inspecting pasted Celo transaction-receipt JSON. It validates a transaction hash, links to the corresponding Blockscout page, and locally decodes receipt metadata and ERC-20 `Transfer` events.
 
-## Run it
+## Hosted demo
+
+Once GitHub Pages finishes deploying, open the public demo at <https://apihpih96.github.io/celo-transaction-trace/>.
+
+## Run it locally
 
 Open `index.html` in a browser. No build step, account, API key, backend, network lookup, or transaction signing is required. The built-in example loads a verified Celo mainnet swap and demonstrates decoding six selected `Transfer` logs.
 
@@ -11,12 +15,16 @@ Open `index.html` in a browser. No build step, account, API key, backend, networ
 - Accepts a transaction receipt as JSON and decodes its status, block number, gas used, transaction hash, log count, and ERC-20 transfer addresses/raw values.
 - Includes a real Celo mainnet example: [`0x3cf7830fb32b72878c49613de423639414e18ba92fa148bbbce6d83461cf9260`](https://celo.blockscout.com/tx/0x3cf7830fb32b72878c49613de423639414e18ba92fa148bbbce6d83461cf9260).
 - The bundled example is a selected-log excerpt, not the complete receipt. Token values remain raw units because token decimals are not included.
-- This is an offline parser, not an autonomous agent. It does not fetch receipts, call Chainstack or another paid service, send transactions, or provide wallet functionality.
+- This is an offline browser tool, not a callable API or autonomous agent. It does not fetch receipts, call Chainstack or another paid service, send transactions, or provide wallet functionality.
 
-## Next build step
+## ERC-8004 profile draft
 
-For the hackathon's Build with Buy track, a later version would need a useful paid service integration with payment proof, plus the event's required project registration, ERC-8004 identity, public repository and pre-transaction attribution setup. None of those on-chain or paid actions are performed by this prototype.
+`agent.json` is a truthful profile for the hosted browser tool. Its `web` service is the public demo; `x402Support` is `false`. It intentionally has no `registrations` entry yet because no ERC-8004 identity has been minted. The file is not yet an on-chain registration, and no transaction has been signed or submitted.
 
-## Repository
+## Hackathon attribution
 
-Public project repository for the Celo Agents on Open Rails hackathon. The working Wabi app includes a richer UI; this repository is a portable, standalone prototype.
+The event tag is `celo_4b23bdd2081f`. Every Celo mainnet transaction must carry this ERC-8021 attribution suffix before it is sent; untagged transactions cannot be credited later. This prototype currently sends no transactions, so it has no transaction-tagging code path and has made no on-chain activity.
+
+## Remaining Build with Buy work
+
+A future Build with Buy version still needs a real paid-service integration with payment proof, plus a tagged transaction flow and an independent user test. None of those paid or on-chain actions are performed by this prototype.

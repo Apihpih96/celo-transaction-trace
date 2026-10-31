@@ -1,0 +1,12 @@
+{
+  "name": "Celo Transaction Trace",
+  "description": "A browser-based Celo transaction receipt decoder. It lets people inspect receipt JSON locally and open the related Blockscout page. The bundled transaction is a selected-log example, not a complete receipt. This prototype does not make live API calls, offer paid services, connect to wallets, or send transactions.",
+  "services": [
+    {
+      "name": "web",
+      "endpoint": "https://apihpih96.github.io/celo-transaction-trace/"
+    }
+  ],
+  "x402Support": false,
+  "active": true
+}
