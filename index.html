@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11161c">
+  <title>Celo Transaction Trace</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #11161c; color: #f3f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 28px 18px 48px; }
+    main { width: min(780px, 100%); margin: 0 auto; }
+    .eyebrow { color: #aebbc7; font: 600 13px/1.5 ui-monospace, monospace; letter-spacing: .12em; }
+    .dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: #61b5ed; }
+    h1 { margin: 30px 0 8px; font-size: clamp(30px, 6vw, 44px); letter-spacing: -.04em; }
+    .lede { margin: 0 0 28px; color: #c2cbd4; font-size: 18px; line-height: 1.55; }
+    label { display: block; margin: 20px 0 8px; font-weight: 650; }
+    input, textarea { display: block; width: 100%; border: 1px solid #687583; border-radius: 10px; background: #1d242c; color: #f3f6f8; padding: 13px 14px; font: 14px/1.55 ui-monospace, monospace; }
+    input { min-height: 52px; }
+    textarea { min-height: 230px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: #aebbc7; }
+    button, .link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; margin: 14px 10px 0 0; padding: 0 16px; border: 0; border-radius: 9px; background: #2477b2; color: white; font: 650 15px system-ui, sans-serif; text-decoration: none; cursor: pointer; }
+    button:hover, .link:hover { background: #318bc9; }
+    .link { border: 1px solid #687583; background: transparent; color: #d7e9f7; }
+    .hint, .limit { color: #c2cbd4; line-height: 1.55; }
+    .status { min-height: 24px; color: #ff9b91; }
+    .card { margin-top: 26px; padding: 18px; border: 1px solid #53616e; border-radius: 12px; background: #171e25; }
+    .card h2 { margin: 0 0 14px; font-size: 21px; }
+    dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0; }
+    dt { color: #b8c3cd; font-size: 13px; }
+    dd { margin: 4px 0 0; overflow-wrap: anywhere; font-weight: 650; }
+    .wide { grid-column: 1 / -1; }
+    ol { display: grid; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+    li { padding: 12px; border: 1px solid #46525e; border-radius: 9px; background: #11161c; }
+    li div { display: grid; gap: 4px; margin: 5px 0; }
+    li span { color: #b8c3cd; font-size: 12px; }
+    code { overflow-wrap: anywhere; color: #e1edf6; }
+    .pass { padding: 10px 12px; border: 1px solid #3b9a6b; border-radius: 8px; color: #a8edc8; background: #14271e; }
+    .foot { margin-top: 30px; padding-top: 18px; border-top: 1px solid #46525e; color: #c2cbd4; line-height: 1.55; }
+    @media (max-width: 480px) { body { padding: 22px 14px 36px; } .card { padding: 14px; } dl { gap: 12px; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow"><span class="dot"></span>CELO / RECEIPT DECODER</div>
+  <h1>Trace a transaction</h1>
+  <p class="lede">Paste a Celo transaction hash to open Blockscout, or inspect receipt JSON locally in your browser.</p>
+  <label for="hash">Transaction hash</label>
+  <input id="hash" spellcheck="false" autocomplete="off" placeholder="0x followed by 64 hex characters">
+  <p id="hashStatus" class="status" aria-live="polite"></p>
+  <a id="explorerLink" class="link" hidden target="_blank" rel="noopener noreferrer">Open in Blockscout ↗</a>
+  <section>
+    <label for="receipt">Receipt JSON</label>
+    <p class="hint">The example below is a selected-log excerpt from a verified Celo mainnet swap, not a complete receipt.</p>
+    <textarea id="receipt" spellcheck="false" autocapitalize="off"></textarea>
+    <button id="decode" type="button">Decode receipt</button>
+    <button id="example" type="button">Load and decode example</button>
+    <p id="error" class="status" aria-live="polite"></p>
+    <div id="result" class="card" hidden></div>
+  </section>
+  <footer class="foot">Offline prototype only. No live lookup, paid service call, wallet, or transaction sending. Transfer values stay in raw token units because decimals are not included.</footer>
+</main>
+<script>
+(() => {
+  const TX_HASH = '0x3cf7830fb32b72878c49613de423639414e18ba92fa148bbbce6d83461cf9260';
+  const BLOCKSCOUT = 'https://celo.blockscout.com/tx/';
+  const TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  const makeTopic = address => '0x' + address.replace(/^0x/i, '').toLowerCase().padStart(64, '0');
+  const rawLogs = [
+    ['0x9346F43c1588B6DF1D52bdD6Bf846064F92d9Cba', '0xC4F2eC2D2E1631B8A3eB342dcF124f0d1E9C20E1', '0x89c6340B1a1f4b25D36cd8B063D49045caF3f818', '0x0000000000000000000000000000000000000000000000d8e5076dcb21e40000'],
+    ['0x9346F43c1588B6DF1D52bdD6Bf846064F92d9Cba', '0x89c6340B1a1f4b25D36cd8B063D49045caF3f818', '0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE', '0x0000000000000000000000000000000000000000000000d8e5076dcb21e40000'],
+    ['0x9346F43c1588B6DF1D52bdD6Bf846064F92d9Cba', '0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE', '0xf9e41C21F27AEA8780b39Eca105FfAF328f1879a', '0x0000000000000000000000000000000000000000000000d8e5076dcb21e40000'],
+    ['0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e', '0xf9fE40A3aD409856818af8EB8912A4d79c6cb1d2', '0xf9e41C21F27AEA8780b39Eca105FfAF328f1879a', '0x0000000000000000000000000000000000000000000000000000000118f76b11'],
+    ['0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e', '0xf9e41C21F27AEA8780b39Eca105FfAF328f1879a', '0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE', '0x0000000000000000000000000000000000000000000000000000000118bdbd02'],
+    ['0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e', '0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE', '0xC4F2eC2D2E1631B8A3eB342dcF124f0d1E9C20E1', '0x0000000000000000000000000000000000000000000000000000000118bdbd02'],
+  ];
+  const sample = {
+    transactionHash: TX_HASH,
+    status: '0x1',
+    blockNumber: 60652550,
+    gasUsed: '373186',
+    logs: rawLogs.map(([address, from, to, data]) => ({ address, topics: [TRANSFER, makeTopic(from), makeTopic(to)], data })),
+  };
+  const $ = id => document.getElementById(id);
+  const hashInput = $('hash'), receiptInput = $('receipt'), result = $('result'), error = $('error');
+  const isHash = value => /^0x[a-f\d]{64}$/i.test(value.trim());
+  function updateLink() {
+    const value = hashInput.value.trim();
+    const valid = isHash(value);
+    $('hashStatus').textContent = value && !valid ? 'Use 0x followed by 64 hexadecimal characters.' : '';
+    const link = $('explorerLink');
+    link.hidden = !valid;
+    if (valid) { link.href = BLOCKSCOUT + value; }
+  }
+  function integer(value) {
+    if (typeof value !== 'string' && typeof value !== 'number') return 'Not included';
+    const text = String(value);
+    try {
+      if (/^0x[0-9a-f]+$/i.test(text) || /^\d+$/.test(text)) return BigInt(text).toLocaleString('en-US');
+    } catch (_) {}
+    return text;
+  }
+  function decode(input) {
+    let receipt;
+    try { receipt = JSON.parse(input); } catch (_) { throw new Error('Invalid JSON. Paste a receipt object.'); }
+    if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt) || !Array.isArray(receipt.logs)) throw new Error('This JSON object has no logs array.');
+    const transfers = [];
+    let malformed = 0;
+    for (const log of receipt.logs) {
+      if (!log || !Array.isArray(log.topics) || typeof log.topics[0] !== 'string' || log.topics[0].toLowerCase() !== TRANSFER) continue;
+      const [fromTopic, toTopic] = [log.topics[1], log.topics[2]];
+      if (typeof fromTopic !== 'string' || !/^0x0{24}[0-9a-f]{40}$/i.test(fromTopic) || typeof toTopic !== 'string' || !/^0x0{24}[0-9a-f]{40}$/i.test(toTopic) || typeof log.data !== 'string' || !/^0x[0-9a-f]{64}$/i.test(log.data)) { malformed++; continue; }
+      transfers.push({ from: '0x' + fromTopic.slice(-40), to: '0x' + toTopic.slice(-40), rawValue: BigInt(log.data).toString(10) });
+    }
+    const status = receipt.status == null ? 'Not included' : (['0x1','1'].includes(String(receipt.status).toLowerCase()) ? 'Success' : (['0x0','0'].includes(String(receipt.status).toLowerCase()) ? 'Failed' : 'Unrecognized: ' + String(receipt.status)));
+    return { hash: typeof receipt.transactionHash === 'string' && isHash(receipt.transactionHash) ? receipt.transactionHash : 'Not included', status, block: integer(receipt.blockNumber), gas: integer(receipt.gasUsed), count: receipt.logs.length, transfers, malformed };
+  }
+  function show(receipt, isExample) {
+    const data = decode(receipt);
+    result.replaceChildren(); result.hidden = false;
+    const heading = document.createElement('h2'); heading.textContent = 'Receipt summary'; result.append(heading);
+    if (isExample && data.hash === TX_HASH && data.status === 'Success' && data.block === '60,652,550' && data.gas === '373,186' && data.count === 6 && data.transfers.length === 6 && data.transfers[0].rawValue === '4001000000000000000000' && data.transfers[3].rawValue === '4713835281') {
+      const pass = document.createElement('p'); pass.className = 'pass'; pass.textContent = 'Offline parser check passed: metadata and all six selected Transfer logs match the bundled example.'; result.append(pass);
+    }
+    const dl = document.createElement('dl');
+    [['Status',data.status],['Block',data.block],['Gas used',data.gas],['Logs',String(data.count)],['Transaction',data.hash]].forEach(([term,value],i) => { const box=document.createElement('div'); if(i===4) box.className='wide'; const dt=document.createElement('dt');dt.textContent=term;const dd=document.createElement('dd');dd.textContent=value;box.append(dt,dd);dl.append(box); });
+    result.append(dl);
+    const title=document.createElement('h2'); title.style.marginTop='24px'; title.textContent='ERC-20 transfers ('+data.transfers.length+')'; result.append(title);
+    const list=document.createElement('ol');
+    data.transfers.forEach(item=>{const li=document.createElement('li'); [['From',item.from],['To',item.to],['Raw token units',item.rawValue]].forEach(([label,value])=>{const row=document.createElement('div');const span=document.createElement('span');span.textContent=label;const code=document.createElement('code');code.textContent=value;row.append(span,code);li.append(row);});list.append(li);});
+    result.append(list);
+    if (data.malformed) { const note=document.createElement('p');note.className='status';note.textContent='Skipped '+data.malformed+' malformed Transfer log(s).';result.append(note); }
+  }
+  $('decode').addEventListener('click',()=>{ error.textContent=''; try { show(receiptInput.value,false); } catch(e) { result.hidden=true; error.textContent=e.message; } });
+  $('example').addEventListener('click',()=>{hashInput.value=TX_HASH;updateLink();receiptInput.value=JSON.stringify(sample,null,2);error.textContent='';try{show(receiptInput.value,true);}catch(e){result.hidden=true;error.textContent=e.message;}});
+  hashInput.value=TX_HASH; receiptInput.value=JSON.stringify(sample,null,2); updateLink();
+  try { show(receiptInput.value,true); } catch(e) { error.textContent=e.message; }
+})();
+</script>
+</body>
+</html>
