@@ -1,12 +1,19 @@
 {
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
   "name": "Celo Transaction Trace",
-  "description": "A browser-based Celo transaction receipt decoder. It lets people inspect receipt JSON locally and open the related Blockscout page. The bundled transaction is a selected-log example, not a complete receipt. This prototype does not make live API calls, offer paid services, connect to wallets, or send transactions.",
+  "description": "A browser-based Celo receipt decoder with a separate x402-protected receipt lookup API currently deployed on Celo Sepolia only. The web tool decodes pasted receipt JSON locally; the API returns receipt metadata and ERC-20 Transfer logs for a supplied Celo Sepolia transaction hash. No Celo mainnet API or autonomous transaction sender is implemented.",
   "services": [
     {
       "name": "web",
       "endpoint": "https://apihpih96.github.io/celo-transaction-trace/"
+    },
+    {
+      "name": "x402",
+      "endpoint": "https://celo-transaction-trace.onrender.com/decode",
+      "network": "eip155:11142220",
+      "description": "POST /decode; x402 payment required at 0.01 Celo Sepolia USDC per request; returns decoded Celo Sepolia receipt JSON."
     }
   ],
-  "x402Support": false,
+  "x402Support": true,
   "active": true
 }
