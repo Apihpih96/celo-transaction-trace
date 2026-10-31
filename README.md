@@ -25,6 +25,10 @@ Open `index.html` in a browser. No build step, account, API key, backend, networ
 
 The event tag is `celo_4b23bdd2081f`. Every Celo mainnet transaction must carry this ERC-8021 attribution suffix before it is sent; untagged transactions cannot be credited later. This prototype currently sends no transactions, so it has no transaction-tagging code path and has made no on-chain activity.
 
+## Experimental Celo Sepolia x402 demo
+
+`sepolia-demo/` contains a separate TypeScript receipt-lookup service and buyer configured for Celo Sepolia. Its local TypeScript build and unpaid `402 Payment Required` check passed; that check advertises a 0.01 test-USDC price but makes no payment. The service is not deployed, and no payment has been signed or settled. The optional buyer script signs a real testnet USDC authorization, so do not run it without explicit approval. There is no mainnet mode.
+
 ## Remaining Build with Buy work
 
-A future Build with Buy version still needs a real paid-service integration with payment proof, plus a tagged transaction flow and an independent user test. None of those paid or on-chain actions are performed by this prototype.
+The Sepolia demo still needs public hosting and an actual paid test to prove settlement. The mainnet attribution-tagged transaction flow, ERC-8004 identity registration, and independent-user test also remain unfinished. No paid or on-chain action has been performed.
