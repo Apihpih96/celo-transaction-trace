@@ -12,7 +12,7 @@ function setBusy(busy) {
   button.disabled = busy;
   button.querySelector("span:first-child").textContent = busy ? "Checking…" : "Preview route";
   loading.hidden = !busy;
-  errorBox.hidden = true;
+  if (busy) errorBox.hidden = true;
 }
 
 function showError(message) {
