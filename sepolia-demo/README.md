@@ -1,6 +1,10 @@
 # Celo Sepolia x402 receipt demo
 
-This adds a testnet-only paid HTTP API to Celo Transaction Trace. `POST /decode` asks an x402 client for 0.01 test USDC, then reads a Celo Sepolia receipt through Forno and returns receipt metadata plus decoded ERC-20 `Transfer` logs. It does not touch Celo mainnet and has no mainnet mode.
+This is a testnet-only paid HTTP API for Celo Transaction Trace. `POST /decode` asks an x402 client for 0.01 test USDC, then reads a Celo Sepolia receipt through Forno and returns receipt metadata plus decoded ERC-20 `Transfer` logs. The live service is <https://celo-transaction-trace.onrender.com/decode>; `/healthz` returned `200` and an unpaid `/decode` request returned `402 Payment Required` when checked on 2026-11-02. The API itself does not touch Celo mainnet and has no mainnet mode.
+
+## Verified settlement
+
+A demonstration request successfully settled exactly `0.01` test USDC on Celo Sepolia, and the API returned the decoded receipt. This is evidence that the testnet payment path worked for that request; it is not a free-use guarantee or a promise of current uptime. Do not repeat a paid test unless you explicitly choose to make another testnet payment.
 
 ## Safe, unpaid check
 
@@ -24,5 +28,5 @@ For a real settlement, save the buyer key only in this ignored local `.env`, set
 - Price: `10000` raw USDC units = 0.01 USDC (USDC has 6 decimals).
 - The receipt lookup uses the public Celo Sepolia Forno RPC endpoint.
 - `pnpm check:402` is a no-payment check, not evidence that settlement works.
-- No production hosting is configured. GitHub Pages only hosts the static demo; this seller runs locally until deliberately deployed to a server.
-- This does not yet provide a mainnet tagged transaction flow, ERC-8004 registration, or an independent-user test.
+- The seller is deployed on Render at <https://celo-transaction-trace.onrender.com/decode>; GitHub Pages hosts the separate static browser decoder.
+- The project has a separate ERC-8004 identity registered on Celo Mainnet (agent ID `10016`) with the event attribution tag. That identity registration is not an API mainnet mode: this service remains fixed to Celo Sepolia. No independent-user test is claimed here.
