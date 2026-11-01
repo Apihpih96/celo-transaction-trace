@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#102b27" />
+    <title>Celo Registration Receipt</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand-mark" aria-hidden="true">C</div>
+        <div><p class="eyebrow">CELO · MAINNET</p><h1>Registration receipt</h1></div>
+        <span class="network-chip"><span class="dot"></span> 42220</span>
+      </header>
+
+      <section class="intro card">
+        <p class="eyebrow">ERC-8004 · READ-ONLY CHECK</p>
+        <h2>Your Celo registration</h2>
+        <p>The registration is already submitted. This page only checks its public receipt; it cannot connect to a wallet or send another transaction.</p>
+      </section>
+
+      <section class="card details" aria-label="Transaction details">
+        <div class="section-heading"><h2>Transaction details</h2><span class="tag-pill">tagged</span></div>
+        <dl>
+          <div><dt>Network</dt><dd>Celo Mainnet <span class="muted">(chain 42220)</span></dd></div>
+          <div><dt>ERC-8004 agent ID</dt><dd>10016</dd></div>
+          <div><dt>Wallet owner</dt><dd id="wallet">—</dd></div>
+          <div><dt>Contract</dt><dd><code id="registry"></code></dd></div>
+          <div><dt>Function</dt><dd><code>register(agentURI)</code></dd></div>
+          <div><dt>Agent profile</dt><dd><a id="profile-link" target="_blank" rel="noreferrer"></a></dd></div>
+          <div><dt>Attribution tag</dt><dd><code id="tag"></code></dd></div>
+          <div><dt>Registration status</dt><dd id="registration-status">Checking</dd></div>
+          <div><dt>Transaction hash</dt><dd><code id="transaction-hash">—</code></dd></div>
+          <div><dt>Block</dt><dd id="block-number">—</dd></div>
+          <div><dt>Confirmations</dt><dd id="confirmations">—</dd></div>
+          <div><dt>Actual network fee</dt><dd id="actual-fee">—</dd></div>
+        </dl>
+        <p class="fineprint">Receipt details are read from Celo Mainnet. If the RPC is unavailable, the displayed hash does not prove the receipt was checked during this session.</p>
+      </section>
+
+      <section class="warning card">
+        <div class="warning-icon" aria-hidden="true">!</div>
+        <div><strong>This registration belongs to the listed wallet.</strong><p>The transaction used the tagged profile and Celo Identity Registry. This page has no signing controls and will never submit another registration.</p></div>
+      </section>
+
+      <section class="controls card">
+        <div id="status" class="status" role="status" aria-live="polite">Checking Celo Mainnet…</div>
+        <div class="button-row">
+          <button id="check-receipt" class="button primary" type="button">Check receipt again</button>
+        </div>
+
+      </section>
+      <footer>Read-only receipt checker · No wallet connection · No transaction methods</footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -31,6 +31,10 @@ The event tag is `celo_4b23bdd2081f`. The successful ERC-8004 registration trans
 
 `sepolia-demo/` contains a separate TypeScript receipt-lookup service and buyer configured for Celo Sepolia. The live Render service is <https://celo-transaction-trace.onrender.com/decode>; its `/healthz` endpoint returned `200` and an unpaid `/decode` request returned the expected `402 Payment Required` on 2026-11-02. A separate approved demonstration settled exactly `0.01` test USDC on Celo Sepolia and returned a decoded receipt. The optional buyer script signs a testnet USDC authorization, so do not run it without explicit approval. The API has no Celo mainnet mode.
 
+## Read-only registration receipt checker
+
+`registration-receipt-checker/` is a local TypeScript page that displays the completed registration hash and checks its public Celo receipt, owner, registry, profile call, and attribution tag. It has no wallet connection or transaction submission method. See that folder’s README for local build and verification steps.
+
 ## Known limitations
 
 The static browser decoder handles pasted receipt JSON; it does not retrieve receipts itself. The x402 API is a separate Celo Sepolia service, not a mainnet API. An ERC-8004 identity and tagged Celo Mainnet registration now exist, but this does not mean the application can autonomously send mainnet transactions. The successful testnet settlement demonstrates the paid flow, but does not imply future requests are free or guarantee service availability.
