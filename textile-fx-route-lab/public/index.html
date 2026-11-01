@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b1c">
+  <title>Route Lab · Textile FX Scout</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Route Lab home"><span class="brand-mark">↗</span><span>route<span class="brand-light">lab</span></span></a>
+      <div class="environment"><span class="pulse"></span>CELO MAINNET DATA</div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">TEXTILE FX · SOLO AGENT PROTOTYPE</p>
+        <h1>Look before<br><em>you move.</em></h1>
+        <p class="intro">A read-only scout for local-currency FX corridors. Compare two indicative legs before deciding whether a route is worth a closer look.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 340 250" role="img">
+          <defs><linearGradient id="path" x1="0" x2="1"><stop stop-color="#b4dc9a"/><stop offset="1" stop-color="#69c8b2"/></linearGradient></defs>
+          <path d="M49 177 C95 177 89 67 159 67 S219 177 292 177" fill="none" stroke="#28413e" stroke-width="2" stroke-dasharray="5 7"/>
+          <path d="M49 177 C95 177 89 67 159 67 S219 177 292 177" fill="none" stroke="url(#path)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="49" cy="177" r="24" fill="#192826" stroke="#8ebd83" stroke-width="2"/><circle cx="159" cy="67" r="24" fill="#192826" stroke="#70bea7" stroke-width="2"/><circle cx="292" cy="177" r="24" fill="#192826" stroke="#8ebd83" stroke-width="2"/>
+          <text x="49" y="182" text-anchor="middle">$</text><text x="159" y="72" text-anchor="middle">FX</text><text x="292" y="182" text-anchor="middle">$</text>
+          <text class="art-label" x="49" y="222" text-anchor="middle">USDT</text><text class="art-label" x="159" y="112" text-anchor="middle">LOCAL</text><text class="art-label" x="292" y="222" text-anchor="middle">USDT</text>
+        </svg>
+        <span class="art-note">QUOTE → COMPARE → DECIDE</span>
+      </div>
+    </section>
+
+    <section class="lab" aria-labelledby="lab-title">
+      <div class="lab-heading"><div><p class="eyebrow">ROUTE SIMULATOR</p><h2 id="lab-title">Test a round trip</h2></div><span class="readonly"><span class="lock">◈</span> READ-ONLY</span></div>
+      <form id="quote-form">
+        <label class="field"><span>Corridor</span><select id="pair" name="pair"><option value="wARS">Argentina · wARS</option><option value="cNGN">Nigeria · cNGN</option><option value="wBRL">Brazil · wBRL</option><option value="wCOP">Colombia · wCOP</option><option value="wMXN">Mexico · wMXN</option><option value="IDRX">Indonesia · IDRX</option></select></label>
+        <label class="field amount-field"><span>Starting amount</span><div class="amount-wrap"><span>USDT</span><input id="amount" name="amount" inputmode="decimal" value="10" aria-label="Starting amount in USDT" required></div></label>
+        <button id="preview-button" type="submit"><span>Preview route</span><span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="field-hint">Indicative preview only · 0.01–1,000 USDT · no order or wallet connection</p>
+
+      <div id="loading" class="loading" hidden><span class="spinner"></span>Fetching two indicative previews…</div>
+      <div id="error" class="error" role="alert" hidden></div>
+      <section id="result" class="result" aria-live="polite" hidden>
+        <div class="result-top"><div><span class="result-kicker">CURRENT INDICATIVE ROUTE</span><h3 id="result-title">USDT <span>↔</span> wARS</h3></div><span class="time" id="sampled-time"></span></div>
+        <div class="route-steps">
+          <div class="step"><span class="step-no">01</span><div><strong id="leg-one">10 USDT → …</strong><small>USDT to local currency</small></div><span class="step-arrow">→</span></div>
+          <div class="step"><span class="step-no">02</span><div><strong id="leg-two">… → USDT</strong><small>Local currency back to USDT</small></div><span class="step-arrow">↩</span></div>
+        </div>
+        <div class="outcome"><div><span class="result-kicker">INDICATIVE DIFFERENCE</span><p id="delta">—</p></div><div class="outcome-pct" id="return-pct">—</div></div>
+        <p class="not-profit"><span>ⓘ</span><span id="disclaimer">This is not realized profit.</span></p>
+      </section>
+    </section>
+
+    <section class="guardrails">
+      <div class="guard-title"><span class="shield">✓</span><div><p class="eyebrow">BUILT TO OBSERVE, NOT EXECUTE</p><h2>No wallet. No trades.</h2></div></div>
+      <div class="guard-grid"><p>This demo reads public Celo corridor levels and asks Textile for free indicative previews. It cannot request a firm quote, connect a wallet, sign, approve or send tokens.</p><p>Two separate previews may be stale or non-executable. The estimate excludes gas, slippage and execution risk. It is not financial advice or evidence of a completed trade.</p></div>
+    </section>
+
+    <footer><span>ROUTE LAB <span class="dot">·</span> OPEN RAILS</span><span>Previewing public Textile FX data on Celo</span></footer>
+  </main>
+</body>
+</html>

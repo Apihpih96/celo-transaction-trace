@@ -14,6 +14,9 @@
     .dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: #61b5ed; }
     h1 { margin: 30px 0 8px; font-size: clamp(30px, 6vw, 44px); letter-spacing: -.04em; }
     .lede { margin: 0 0 28px; color: #c2cbd4; font-size: 18px; line-height: 1.55; }
+    .project-link { margin: 0 0 26px; padding: 14px 16px; border: 1px solid #53616e; border-radius: 10px; background: #171e25; color: #d7e9f7; line-height: 1.5; }
+    .project-link a { color: #8dcaf3; font-weight: 650; }
+    .project-link p { margin: 4px 0 0; color: #c2cbd4; }
     label { display: block; margin: 20px 0 8px; font-weight: 650; }
     input, textarea { display: block; width: 100%; border: 1px solid #687583; border-radius: 10px; background: #1d242c; color: #f3f6f8; padding: 13px 14px; font: 14px/1.55 ui-monospace, monospace; }
     input { min-height: 52px; }
@@ -45,6 +48,7 @@
   <div class="eyebrow"><span class="dot"></span>CELO / RECEIPT DECODER</div>
   <h1>Trace a transaction</h1>
   <p class="lede">Paste a Celo transaction hash to open Blockscout, or inspect receipt JSON locally in your browser.</p>
+  <aside class="project-link"><a href="https://github.com/Apihpih96/celo-transaction-trace/tree/master/textile-fx-route-lab" target="_blank" rel="noopener noreferrer">Explore Textile FX Route Lab ↗</a><p>Separate local, read-only market-preview demo; no wallet or trading. Requires Node.js to run.</p></aside>
   <label for="hash">Transaction hash</label>
   <input id="hash" spellcheck="false" autocomplete="off" placeholder="0x followed by 64 hex characters">
   <p id="hashStatus" class="status" aria-live="polite"></p>

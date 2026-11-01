@@ -6,6 +6,10 @@ A small, dependency-free browser tool for inspecting pasted Celo transaction-rec
 
 The public demo is live at <https://apihpih96.github.io/celo-transaction-trace/> (checked 2026-11-02).
 
+## Textile FX Route Lab
+
+`textile-fx-route-lab/` adds a separate, read-only Celo FX preview demo. It reads public Textile corridor levels and requests two free indicative previews; it has no wallet, signer, trade, or settlement path. It runs locally with Node.js 18+ using `npm run demo` from that folder. The estimates are not executable quotes or realized P&L and exclude gas and execution risk. See the [Route Lab README](textile-fx-route-lab/README.md) for setup, limits, and tests. The demo source is public, but it is not hosted by the static GitHub Pages site.
+
 ## Run it locally
 
 Open `index.html` in a browser. No build step, account, API key, backend, network lookup, or transaction signing is required. The built-in example loads a verified Celo mainnet swap and demonstrates decoding six selected `Transfer` logs.

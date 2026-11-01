@@ -1,0 +1,11 @@
+{
+  "name": "textile-fx-route-lab",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo": "node server.mjs",
+    "scan": "node scan.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}
