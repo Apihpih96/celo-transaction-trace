@@ -1,0 +1,9 @@
+packages:
+  - .
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - hono@4.13.16
+  - viem@2.57.14
+onlyBuiltDependencies:
+  - esbuild
