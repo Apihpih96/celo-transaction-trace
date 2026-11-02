@@ -22,6 +22,9 @@ function showError(message) {
 }
 
 function safeNumber(value) {
+  if ((typeof value !== "number" && typeof value !== "string") || (typeof value === "string" && value.trim() === "")) {
+    throw new Error("The quote response contained an invalid amount.");
+  }
   const number = Number(value);
   if (!Number.isFinite(number)) throw new Error("The quote response contained an invalid amount.");
   return number;
@@ -45,13 +48,13 @@ form.addEventListener("submit", async (event) => {
     const mid = safeNumber(data.intermediate);
     const finish = safeNumber(data.returnAmount);
     const delta = safeNumber(data.delta);
-    const pct = safeNumber(data.roiPct);
+    const pct = data.roiPct == null ? null : safeNumber(data.roiPct);
     document.querySelector("#result-title").textContent = `USDT ↔ ${pairName}`;
     document.querySelector("#leg-one").textContent = `${money.format(start)} USDT → ${money.format(mid)} ${pairName}`;
     document.querySelector("#leg-two").textContent = `${money.format(mid)} ${pairName} → ${money.format(finish)} USDT`;
     const sign = delta > 0 ? "+" : "";
     document.querySelector("#delta").textContent = `${sign}${money.format(delta)} USDT`;
-    document.querySelector("#return-pct").textContent = `${sign}${pct.toFixed(4)}%`;
+    document.querySelector("#return-pct").textContent = pct === null ? "—" : `${sign}${pct.toFixed(4)}%`;
     document.querySelector("#sampled-time").textContent = `sampled ${new Date(data.sampledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
     document.querySelector("#disclaimer").textContent = `${data.disclaimer} Levels timestamp: ${data.levelsAsOf ? new Date(data.levelsAsOf).toLocaleString() : "not supplied"}.`;
     outcome.classList.toggle("negative", delta < 0);
