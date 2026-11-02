@@ -68,3 +68,45 @@ test("keeps quote errors visible after loading ends and clears them on retry", a
   assert.equal(error.hidden, true);
   assert.equal(result.hidden, false);
 });
+
+
+test("does not present a missing ROI as a zero-percent result", async () => {
+  const app = loadApp(async () => ({
+    ok: true,
+    json: async () => ({
+      amount: "10",
+      intermediate: "20",
+      returnAmount: "9.99",
+      delta: "-0.01",
+      roiPct: null,
+      sampledAt: "2026-11-02T00:00:00Z",
+      levelsAsOf: null,
+      disclaimer: "Indicative only.",
+    }),
+  }));
+
+  await submit(app.form);
+  assert.equal(app.elements.get("#return-pct").textContent, "—");
+  assert.equal(app.elements.get("#result").hidden, false);
+});
+
+test("rejects null quote amounts instead of formatting them as zero", async () => {
+  const app = loadApp(async () => ({
+    ok: true,
+    json: async () => ({
+      amount: null,
+      intermediate: "20",
+      returnAmount: "9.99",
+      delta: "-0.01",
+      roiPct: -0.1,
+      sampledAt: "2026-11-02T00:00:00Z",
+      levelsAsOf: null,
+      disclaimer: "Indicative only.",
+    }),
+  }));
+
+  await submit(app.form);
+  assert.equal(app.elements.get("#error").hidden, false);
+  assert.match(app.elements.get("#error").textContent, /invalid amount/);
+  assert.equal(app.elements.get("#result").hidden, true);
+});
