@@ -16,7 +16,8 @@ function setBusy(busy) {
 }
 
 function showError(message) {
-  errorBox.textContent = message;
+  const text = String(message || "Something went wrong.").trim();
+  errorBox.textContent = /[.!?]$/.test(text) ? text : `${text}.`;
   errorBox.hidden = false;
   resultBox.hidden = true;
 }
@@ -28,6 +29,21 @@ function safeNumber(value) {
   const number = Number(value);
   if (!Number.isFinite(number)) throw new Error("The quote response contained an invalid amount.");
   return number;
+}
+
+let initialRetryLeft = 0;
+
+function isNetworkError(error) {
+  return error instanceof TypeError || /failed to fetch|networkerror|load failed/i.test(String(error && error.message));
+}
+
+async function readJson(response) {
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`The quote service returned an unexpected response (HTTP ${response.status}). Please try again shortly`);
+  }
 }
 
 form.addEventListener("submit", async (event) => {
@@ -42,7 +58,7 @@ form.addEventListener("submit", async (event) => {
   resultBox.hidden = true;
   try {
     const response = await fetch(`/api/quote?pair=${encodeURIComponent(pairName)}&amount=${encodeURIComponent(amountText)}`, { cache: "no-store" });
-    const data = await response.json();
+    const data = typeof response.text === "function" ? await readJson(response) : await response.json();
     if (!response.ok) throw new Error(data.error || "No indicative route is available for those inputs.");
     const start = safeNumber(data.amount);
     const mid = safeNumber(data.intermediate);
@@ -54,17 +70,28 @@ form.addEventListener("submit", async (event) => {
     document.querySelector("#leg-two").textContent = `${money.format(mid)} ${pairName} → ${money.format(finish)} USDT`;
     const sign = delta > 0 ? "+" : "";
     document.querySelector("#delta").textContent = `${sign}${money.format(delta)} USDT`;
-    document.querySelector("#return-pct").textContent = pct === null ? "—" : `${sign}${pct.toFixed(4)}%`;
+    document.querySelector("#return-pct").textContent = pct === null ? "—" : `${pct > 0 ? "+" : ""}${pct.toFixed(4)}%`;
     document.querySelector("#sampled-time").textContent = `sampled ${new Date(data.sampledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
     document.querySelector("#disclaimer").textContent = `${data.disclaimer} Levels timestamp: ${data.levelsAsOf ? new Date(data.levelsAsOf).toLocaleString() : "not supplied"}.`;
     outcome.classList.toggle("negative", delta < 0);
     resultBox.hidden = false;
+    initialRetryLeft = 0;
   } catch (error) {
-    showError(`${error.message} Nothing was signed or sent.`);
+    if (isNetworkError(error) && initialRetryLeft > 0 && typeof setTimeout === "function") {
+      // The free host can be waking up on first open: retry the first load once quietly.
+      initialRetryLeft -= 1;
+      setTimeout(() => form.requestSubmit(), 4000);
+      return;
+    }
+    const message = isNetworkError(error)
+      ? "Couldn't reach the quote service. It may be waking up; press Preview route again in a moment"
+      : error.message;
+    showError(`${String(message).replace(/[.!?]?\s*$/, ".")} Nothing was signed or sent.`);
   } finally {
     setBusy(false);
   }
 });
 
 // Load a real read-only preview on first open; never use a fabricated sample.
+initialRetryLeft = 1;
 form.requestSubmit();

@@ -96,3 +96,20 @@ test("shows an error instead of treating a missing quote amount as zero", async 
   assert.match(app.elements.get("#error").textContent, /invalid amount/);
   assert.equal(app.elements.get("#result").hidden, true);
 });
+
+test("explains a network failure with a readable sentence", async () => {
+  const app = loadApp(async () => { throw new TypeError("Failed to fetch"); });
+  await submit(app.form);
+  const text = app.elements.get("#error").textContent;
+  assert.match(text, /Couldn't reach the quote service/);
+  assert.match(text, /\. Nothing was signed or sent\.$/);
+  assert.doesNotMatch(text, /fetch Nothing/);
+});
+
+test("handles a non-JSON error page from the host", async () => {
+  const app = loadApp(async () => ({ ok: false, status: 502, text: async () => "<html>Bad gateway</html>" }));
+  await submit(app.form);
+  const text = app.elements.get("#error").textContent;
+  assert.match(text, /unexpected response \(HTTP 502\)/);
+  assert.equal(app.elements.get("#result").hidden, true);
+});
