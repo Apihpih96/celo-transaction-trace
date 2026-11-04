@@ -78,7 +78,7 @@ async function quote(pair, amountText) {
 const server = http.createServer(async (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "no-referrer");
-  res.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.devnet.solana.com; img-src 'self' data:");
   try {
     const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
     if (req.method === "GET" && url.pathname === "/api/quote") {
@@ -110,7 +110,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (req.method !== "GET") { res.writeHead(405); res.end("Method not allowed"); return; }
-    const staticFiles = { "/": ["index.html", "text/html; charset=utf-8"], "/index.html": ["index.html", "text/html; charset=utf-8"], "/style.css": ["style.css", "text/css; charset=utf-8"], "/app.js": ["app.js", "text/javascript; charset=utf-8"] };
+    const staticFiles = { "/": ["index.html", "text/html; charset=utf-8"], "/index.html": ["index.html", "text/html; charset=utf-8"], "/style.css": ["style.css", "text/css; charset=utf-8"], "/app.js": ["app.js", "text/javascript; charset=utf-8"], "/devnet": ["devnet.html", "text/html; charset=utf-8"], "/devnet.html": ["devnet.html", "text/html; charset=utf-8"], "/devnet.css": ["devnet.css", "text/css; charset=utf-8"], "/devnet.js": ["devnet.js", "text/javascript; charset=utf-8"] };
     const staticFile = staticFiles[url.pathname];
     if (!staticFile) { res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }); res.end("Not found"); return; }
     const content = await readFile(join(ROOT, "public", staticFile[0]));

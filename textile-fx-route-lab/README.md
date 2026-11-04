@@ -1,11 +1,12 @@
-# Textile FX Route Lab — read-only prototype
+# Textile FX Route Lab — read-only previews + Devnet proof
 
-A responsive demo with two deliberately separate modules:
+A responsive prototype with two read-only market-data panels and a separate optional Devnet write demo:
 
 - Textile FX corridor previews on Celo (USDT → local token → USDT).
 - A Solana mainnet read-only integration that checks the USDC and USDT mint accounts through Solana RPC, then asks Jupiter Swap API v2 for a quote-only USDC → USDT route.
+- A separate Solana Devnet page for an explicitly user-signed Memo Program transaction; it transfers no tokens and does not alter either preview panel.
 
-The Solana module never supplies a taker address, wallet, signer, or API key. The code requires Jupiter to return `transaction: null`; it does not retain or use a transaction payload. It never calls `/execute`, submits, bridges, or trades. Solana/Jupiter is not presented as Textile liquidity or a Celo-to-Solana route.
+The Solana mainnet quote module never supplies a taker address, wallet, signer, or API key. The code requires Jupiter to return `transaction: null`; it does not retain or use a transaction payload. That quote panel never calls `/execute`, submits, bridges, or trades. Solana/Jupiter is not presented as Textile liquidity or a Celo-to-Solana route; only the separate Devnet page can request a wallet-signed memo transaction.
 
 ## Run the demo
 
@@ -17,7 +18,7 @@ Requirements: Node.js 18 or newer. No `npm install` or API key is needed.
 4. Open `http://127.0.0.1:4173`.
 5. The Celo/Textile preview loads in its own panel. To make a Solana request, enter an amount and press **Fetch quote**. Stop the server with Ctrl+C.
 
-The app server binds only to `127.0.0.1`. Each module has its own read-only panel and explanation. The Solana input is capped at 1,000 USDC; one quote action makes one confirmed-account RPC read and one Jupiter `/order` GET. The app also enforces a short interval between Jupiter requests to stay within keyless public limits. Quotes are live and may change or be unavailable; no sample price is hard-coded.
+The app server binds only to `127.0.0.1`. Each market-data panel has its own explanation. The Solana input is capped at 1,000 USDC; one quote action makes one confirmed-account RPC read and one Jupiter `/order` GET. The app also enforces a short interval between Jupiter requests to stay within keyless public limits. Quotes are live and may change or be unavailable; no sample price is hard-coded.
 
 ## Solana integration details
 
@@ -27,6 +28,12 @@ The app server binds only to `127.0.0.1`. Each module has its own read-only pane
 - Has no wallet connection, key custody, signing, transaction submission, execution, or automatic refresh. Nothing is sent to Solana except read-only RPC/API requests.
 
 Jupiter's public keyless rate limit is 0.5 requests/second; the server applies a conservative local throttle. Solana public RPC availability is not guaranteed. The amount is only a quote input, not a balance or order. A quote is not an executable guarantee or financial advice.
+
+## Separate Solana Devnet proof
+
+Open `http://127.0.0.1:4173/devnet` while the local server is running. This independent page lets the user connect a Phantom wallet, check its Devnet SOL balance, and—only after the wallet approves—send a Memo Program transaction on Solana Devnet. It transfers no tokens and never receives or stores private keys. Devnet test SOL is needed for the network fee. The memo is permanently public; the page warns against entering personal or secret data. This is a real Devnet write demo, not a deployed smart contract, bridge, Textile route, or mainnet transaction.
+
+The page loads a pinned, bundled `@solana/web3.js` version; its source is `devnet-app.mjs` and `devnet-core.mjs`. Rebuild the browser bundle with `pnpm install` followed by `pnpm run build:devnet`; `pnpm test` runs the tests. The existing demo server must run locally; it is not hosted on GitHub Pages.
 
 ## Textile/Celo module
 
@@ -41,7 +48,7 @@ node scan.mjs --pair wARS --amount 10
 node scan.mjs --pair all --amount 10
 ```
 
-The tests cover amount parsing, arithmetic, Textile corridor selection, Jupiter query construction, SPL mint verification and quote-only response validation.
+The tests cover amount parsing, arithmetic, Textile corridor selection, Jupiter query construction, SPL mint verification, quote-only response validation, and the separate Devnet memo transaction flow including uncertain confirmations.
 
 ## Public references
 
