@@ -20,6 +20,7 @@
         <p class="eyebrow">TEXTILE FX · SOLO AGENT PROTOTYPE</p>
         <h1>Look before<br><em>you move.</em></h1>
         <p class="intro">A read-only scout for local-currency FX corridors. Compare two indicative legs before deciding whether a route is worth a closer look.</p>
+        <a class="devnet-link" href="/devnet">Try the separate Solana Devnet proof <span aria-hidden="true">↗</span></a>
       </div>
       <div class="hero-art" aria-hidden="true">
         <svg viewBox="0 0 340 250" role="img">
@@ -56,12 +57,30 @@
       </section>
     </section>
 
-    <section class="guardrails">
-      <div class="guard-title"><span class="shield">✓</span><div><p class="eyebrow">BUILT TO OBSERVE, NOT EXECUTE</p><h2>No wallet. No trades.</h2></div></div>
-      <div class="guard-grid"><p>This demo reads public Celo corridor levels and asks Textile for free indicative previews. It cannot request a firm quote, connect a wallet, sign, approve or send tokens.</p><p>Two separate previews may be stale or non-executable. The estimate excludes gas, slippage and execution risk. It is not financial advice or evidence of a completed trade.</p></div>
+    <section class="solana-lab" aria-labelledby="solana-title">
+      <div class="lab-heading"><div><p class="eyebrow">SEPARATE SOLANA PROTOTYPE</p><h2 id="solana-title">Compare a stablecoin quote</h2></div><span class="readonly"><span class="lock">◈</span> QUOTE ONLY</span></div>
+      <p class="solana-intro">Solana mainnet RPC confirms both stablecoin mints, then Jupiter supplies a read-only quote—separate from Textile’s Celo FX corridors.</p>
+      <form id="solana-form" class="solana-form">
+        <label class="field amount-field"><span>Input amount</span><div class="amount-wrap"><span>USDC</span><input id="solana-amount" name="amount" inputmode="decimal" value="10" aria-label="Input amount in Solana USDC" required></div></label>
+        <div class="field"><span>Route</span><div class="route-label">Solana USDC → USDT</div></div>
+        <button id="solana-button" type="submit"><span>Fetch quote</span><span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="field-hint">Public Jupiter quote · keyless demo · up to 1,000 USDC · no wallet or order</p>
+      <div id="solana-loading" class="loading" hidden><span class="spinner"></span>Fetching a quote-only route…</div>
+      <div id="solana-error" class="error" role="alert" hidden></div>
+      <section id="solana-result" class="result" aria-live="polite" hidden>
+        <div class="result-top"><div><span class="result-kicker">SOLANA · JUPITER</span><h3 id="solana-result-title">10 USDC → … USDT</h3></div><span class="time" id="solana-sampled-time"></span></div>
+        <div class="solana-details"><div><span class="result-kicker">ROUTER</span><strong id="solana-router">—</strong></div><div><span class="result-kicker">FEE RATE</span><strong id="solana-fee">—</strong></div><div><span class="result-kicker">PRICE IMPACT</span><strong id="solana-impact">Not supplied</strong><span class="result-kicker">RPC SLOT</span><strong id="solana-slot">—</strong></div></div>
+        <p class="not-profit"><span>ⓘ</span><span id="solana-disclaimer"></span></p>
+      </section>
     </section>
 
-    <footer><span>ROUTE LAB <span class="dot">·</span> OPEN RAILS</span><span>Previewing public Textile FX data on Celo</span></footer>
+    <section class="guardrails">
+      <div class="guard-title"><span class="shield">✓</span><div><p class="eyebrow">BUILT TO OBSERVE, NOT EXECUTE</p><h2>No wallet. No trades.</h2></div></div>
+      <div class="guard-grid"><p>The Textile module reads public Celo corridor levels and free indicative previews. The separate Solana module asks Jupiter for a quote without a taker address; it discards any unexpected transaction payload.</p><p>Neither module connects a wallet, signs, executes, bridges or sends tokens. Quotes may be stale or non-executable and are not realized returns, financial advice, or evidence of a completed trade.</p></div>
+    </section>
+
+    <footer><span>ROUTE LAB <span class="dot">·</span> OPEN RAILS</span><span>Textile on Celo · Jupiter quote on Solana</span></footer>
   </main>
 </body>
 </html>

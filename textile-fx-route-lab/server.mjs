@@ -3,11 +3,14 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { CELO_CHAIN_ID, TEXTILE_API, TOKENS, corridorPair, parseUnits, formatUnits, roundTripResult } from "./strategy.mjs";
+import { solanaQuote } from "./solana.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 4173);
 const MAX_USDT = 1000;
 const SAFE_PAIRS = ["wARS", "cNGN", "wBRL", "wCOP", "wMXN", "IDRX"];
+const MAX_SOLANA_USDC = 1000;
+let lastSolanaQuoteAt = 0;
 
 async function getJson(url, init) {
   const response = await fetch(url, { ...init, signal: AbortSignal.timeout(12000) });
@@ -75,7 +78,7 @@ async function quote(pair, amountText) {
 const server = http.createServer(async (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "no-referrer");
-  res.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; img-src 'self' data:");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.devnet.solana.com; img-src 'self' data:");
   try {
     const url = new URL(req.url, `http://127.0.0.1:${PORT}`);
     if (req.method === "GET" && url.pathname === "/api/quote") {
@@ -86,8 +89,28 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify(result.body));
       return;
     }
+    if (req.method === "GET" && url.pathname === "/api/solana-quote") {
+      const now = Date.now();
+      if (now - lastSolanaQuoteAt < 2100) {
+        res.writeHead(429, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "retry-after": "3" });
+        res.end(JSON.stringify({ error: "Jupiter’s public keyless limit is 0.5 requests per second. Wait a moment before refreshing." }));
+        return;
+      }
+      lastSolanaQuoteAt = now;
+      let body;
+      try {
+        const amount = url.searchParams.get("amount") || "10";
+        const units = parseUnits(amount, 6);
+        if (units > BigInt(MAX_SOLANA_USDC) * 10n ** 6n) throw new Error(`Demo notional is capped at ${MAX_SOLANA_USDC} USDC.`);
+        body = await solanaQuote(units);
+      } catch (error) { body = { error: `Jupiter read failed: ${error.message}` }; }
+      const status = body.error ? 502 : 200;
+      res.writeHead(status, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+      res.end(JSON.stringify(body));
+      return;
+    }
     if (req.method !== "GET") { res.writeHead(405); res.end("Method not allowed"); return; }
-    const staticFiles = { "/": ["index.html", "text/html; charset=utf-8"], "/index.html": ["index.html", "text/html; charset=utf-8"], "/style.css": ["style.css", "text/css; charset=utf-8"], "/app.js": ["app.js", "text/javascript; charset=utf-8"] };
+    const staticFiles = { "/": ["index.html", "text/html; charset=utf-8"], "/index.html": ["index.html", "text/html; charset=utf-8"], "/style.css": ["style.css", "text/css; charset=utf-8"], "/app.js": ["app.js", "text/javascript; charset=utf-8"], "/devnet": ["devnet.html", "text/html; charset=utf-8"], "/devnet.html": ["devnet.html", "text/html; charset=utf-8"], "/devnet.css": ["devnet.css", "text/css; charset=utf-8"], "/devnet.js": ["devnet.js", "text/javascript; charset=utf-8"] };
     const staticFile = staticFiles[url.pathname];
     if (!staticFile) { res.writeHead(404, { "content-type": "text/plain; charset=utf-8" }); res.end("Not found"); return; }
     const content = await readFile(join(ROOT, "public", staticFile[0]));

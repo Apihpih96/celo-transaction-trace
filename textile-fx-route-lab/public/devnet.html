@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b1c">
+  <title>Devnet Proof · Route Lab</title>
+  <link rel="stylesheet" href="/devnet.css">
+  <script src="/devnet.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Back to Route Lab"><span class="brand-mark">↗</span><span>route<span class="brand-light">lab</span></span></a>
+      <span class="environment"><span class="pulse"></span>DEVNET ONLY</span>
+    </header>
+    <section class="hero">
+      <p class="eyebrow">SOLANA · ON-CHAIN PROOF</p>
+      <h1>Write one<br><em>public memo.</em></h1>
+      <p class="intro">Connect a Solana wallet set to Devnet, then sign a memo-only transaction. The app never handles keys or transfers tokens.</p>
+    </section>
+    <section class="panel" aria-labelledby="wallet-heading">
+      <div class="panel-heading"><div><p class="eyebrow">YOUR DEVNET WALLET</p><h2 id="wallet-heading">Connect, then confirm a message</h2></div><span class="badge">NO TOKEN TRANSFER</span></div>
+      <div class="wallet-row"><div><span class="label">ADDRESS</span><strong id="wallet-status">No wallet connected</strong></div><div><span class="label">BALANCE</span><strong id="wallet-balance">—</strong></div></div>
+      <button id="connect-wallet" type="button">Connect Phantom wallet <span aria-hidden="true">↗</span></button>
+      <label class="field" for="memo-text">Public memo text</label>
+      <textarea id="memo-text" rows="2" maxlength="280">Route Lab devnet proof</textarea>
+      <p class="hint">This memo is permanently public on Devnet. Don’t include names, secrets, or personal information. Maximum 280 UTF-8 bytes.</p>
+      <button id="record-proof" type="button" disabled>Sign &amp; record on Devnet <span aria-hidden="true">↗</span></button>
+      <p class="hint">Requires a Devnet wallet with test SOL for the network fee. <a href="https://faucet.solana.com/" target="_blank" rel="noreferrer">Open the Solana faucet</a> if needed.</p>
+      <div id="status-message" class="status" role="status" hidden></div>
+      <section id="transaction-result" class="tx-result" hidden>
+        <span class="label">DEVNET TRANSACTION</span>
+        <a id="transaction-link" href="#" target="_blank" rel="noreferrer"></a>
+        <small id="transaction-note">Opens Solana Explorer on Devnet.</small>
+      </section>
+    </section>
+    <section class="notes">
+      <h2>What this proves</h2>
+      <p>A wallet-signed Memo Program transaction was confirmed on Solana Devnet. It demonstrates a real on-chain write without a token transfer; it does not prove a smart contract, Celo↔Solana bridge, Textile route, or mainnet product.</p>
+      <p>Only the wallet approves and signs. Verify Phantom is on Devnet before signing. The page sends the transaction to the Devnet RPC endpoint and shows the confirmed explorer record.</p>
+    </section>
+    <footer><a href="/">← Back to Textile FX Route Lab</a><span>Solana Devnet · Memo program</span></footer>
+  </main>
+</body>
+</html>

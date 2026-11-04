@@ -1,41 +1,45 @@
-# Textile FX Route Lab — solo demo prototype
+# Textile FX Route Lab — read-only previews + Devnet proof
 
-A small, responsive, read-only demo for exploring a Textile FX corridor on Celo. It reads current public corridor levels, requests two free indicative previews (USDT → local token → USDT), and shows the estimated round-trip difference. It is designed to demonstrate the idea without connecting a wallet or making a trade.
+A responsive prototype with two read-only market-data panels and a separate optional Devnet write demo:
 
-## Run the visual demo
+- Textile FX corridor previews on Celo (USDT → local token → USDT).
+- A Solana mainnet read-only integration that checks the USDC and USDT mint accounts through Solana RPC, then asks Jupiter Swap API v2 for a quote-only USDC → USDT route.
+- A separate Solana Devnet page for an explicitly user-signed Memo Program transaction; it transfers no tokens and does not alter either preview panel.
 
-Requirements: Node.js 18 or newer. No `npm install` and no API key are needed.
+The Solana mainnet quote module never supplies a taker address, wallet, signer, or API key. The code requires Jupiter to return `transaction: null`; it does not retain or use a transaction payload. That quote panel never calls `/execute`, submits, bridges, or trades. Solana/Jupiter is not presented as Textile liquidity or a Celo-to-Solana route; only the separate Devnet page can request a wallet-signed memo transaction.
 
-1. Unzip this folder on your computer.
-2. Open a terminal in the `textile-fx-solo` folder.
-3. Run:
+## Run the demo
 
-   ```sh
-   npm run demo
-   ```
+Requirements: Node.js 18 or newer. No `npm install` or API key is needed.
 
-4. Open `http://127.0.0.1:4173` in a browser.
-5. Choose a corridor and starting USDT amount, then press **Preview route**. Stop the server with Ctrl+C.
+1. Unzip this folder.
+2. Open a terminal in `textile-fx-route-lab`.
+3. Run `npm run demo`.
+4. Open `http://127.0.0.1:4173`.
+5. The Celo/Textile preview loads in its own panel. To make a Solana request, enter an amount and press **Fetch quote**. Stop the server with Ctrl+C.
 
-The server listens only on `127.0.0.1`. Default demo notional is 10 USDT and the interface caps it at 1,000 USDT; it is just the amount passed to the free preview API, not an order. Results are live and can change or be unavailable as liquidity changes. No canned profitable result is shown.
+The app server binds only to `127.0.0.1`. Each market-data panel has its own explanation. The Solana input is capped at 1,000 USDC; one quote action makes one confirmed-account RPC read and one Jupiter `/order` GET. The app also enforces a short interval between Jupiter requests to stay within keyless public limits. Quotes are live and may change or be unavailable; no sample price is hard-coded.
 
-## What it does
+## Solana integration details
 
-- Reads Textile's public levels for Celo (chain ID 42220).
-- Uses the documented unauthenticated indicative-preview endpoint for the two legs.
-- Shows the preview time, each leg, approximate difference and explicit limitations.
-- Checks the current corridor minimum/visible size before requesting previews.
-- Includes a `node:test` suite for amount parsing, unit formatting, arithmetic and corridor selection.
+- Reads the canonical Solana mainnet USDC and USDT SPL token mint accounts via `getMultipleAccounts`, validates ownership by the SPL Token program, initialization and six-decimal precision, and displays the confirmed RPC slot.
+- Requests a keyless Jupiter Swap API v2 quote for USDC → USDT. `/order` is called without `taker`, so this is quote-only; the backend rejects any response that is not explicitly transaction-null.
+- Shows the quote router, returned fee basis points, price-impact value when provided, response time and RPC slot. Missing optional fee/impact values are labeled as unavailable.
+- Has no wallet connection, key custody, signing, transaction submission, execution, or automatic refresh. Nothing is sent to Solana except read-only RPC/API requests.
 
-## What it intentionally cannot do
+Jupiter's public keyless rate limit is 0.5 requests/second; the server applies a conservative local throttle. Solana public RPC availability is not guaranteed. The amount is only a quote input, not a balance or order. A quote is not an executable guarantee or financial advice.
 
-This prototype has no wallet connection, private key/API key, allowance, firm-quote request, signature, transaction broadcast, order, settlement, or persistent trade logging. It does not provide a button to execute a route. The local `/api/quote` endpoint is a read-only preview interface; it only calls Textile's public levels and free preview endpoints. The server binds to localhost.
+## Separate Solana Devnet proof
 
-Two separate indicative previews are not simultaneous or executable quotes, can be stale, and exclude gas, slippage, timing and execution risk. The estimate is not realized P&L and is not financial advice. The Textile test environment does not provide a Celo test corridor, so this demo reads public Celo mainnet market data but does not transact on mainnet.
+Open `http://127.0.0.1:4173/devnet` while the local server is running. This independent page lets the user connect a Phantom wallet, check its Devnet SOL balance, and—only after the wallet approves—send a Memo Program transaction on Solana Devnet. It transfers no tokens and never receives or stores private keys. Devnet test SOL is needed for the network fee. The memo is permanently public; the page warns against entering personal or secret data. This is a real Devnet write demo, not a deployed smart contract, bridge, Textile route, or mainnet transaction.
 
-No existing test-USDC demo or previously completed Celo receipt-decoder work is replaced by this prototype. Whether a solo builder's own Textile fills qualify for hackathon judging remains unconfirmed. Do not make mainnet trades or payments based on this demo.
+The page loads a pinned, bundled `@solana/web3.js` version; its source is `devnet-app.mjs` and `devnet-core.mjs`. Rebuild the browser bundle with `pnpm install` followed by `pnpm run build:devnet`; `pnpm test` runs the tests. The existing demo server must run locally; it is not hosted on GitHub Pages.
 
-## Commands
+## Textile/Celo module
+
+The original Textile simulator remains separate and unchanged in purpose: it reads public Celo corridor levels (chain ID 42220), calls Textile's unauthenticated indicative-preview endpoint for two legs, checks visible depth/minimums and shows an estimated difference. These are neither simultaneous nor executable quotes; gas, slippage, timing and execution risk are excluded.
+
+## Commands and tests
 
 ```sh
 npm run demo
@@ -44,12 +48,15 @@ node scan.mjs --pair wARS --amount 10
 node scan.mjs --pair all --amount 10
 ```
 
-The original CLI scanner remains available. The visual Route Lab uses a smaller curated corridor list: wARS, cNGN, wBRL, wCOP, wMXN and IDRX. A corridor can be listed but have no current depth or valid quote.
+The tests cover amount parsing, arithmetic, Textile corridor selection, Jupiter query construction, SPL mint verification, quote-only response validation, and the separate Devnet memo transaction flow including uncertain confirmations.
 
 ## Public references
 
-- Agents on Open Rails: https://www.loops.house/agents-on-open-rails
+- Jupiter Swap API: https://developers.jup.ag/docs/swap
+- Jupiter Order & Execute (including quote-only behavior without `taker`): https://developers.jup.ag/docs/swap/order-and-execute
+- Jupiter rate limits: https://developers.jup.ag/docs/portal/rate-limits
+- Solana mainnet JSON-RPC: https://api.mainnet-beta.solana.com
 - Textile RFQ API: https://docs.textilecredit.com/api/v2/rfq.html
 - Textile quoting guide: https://docs.textilecredit.com/guides/quoting-the-order-book.html
 - Textile Celo address book: https://docs.textilecredit.com/protocol/address-book.html
-- Textile testnet details: https://docs.textilecredit.com/testnet.html
+- Agents on Open Rails: https://www.loops.house/agents-on-open-rails

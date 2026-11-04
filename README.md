@@ -8,7 +8,7 @@ The public demo is live at <https://apihpih96.github.io/celo-transaction-trace/>
 
 ## Textile FX Route Lab
 
-`textile-fx-route-lab/` adds a separate, read-only Celo FX preview demo. It reads public Textile corridor levels and requests two free indicative previews; it has no wallet, signer, trade, or settlement path. It runs locally with Node.js 18+ using `npm run demo` from that folder. The estimates are not executable quotes or realized P&L and exclude gas and execution risk. See the [Route Lab README](textile-fx-route-lab/README.md) for setup, limits, and tests. The demo source is public, but it is not hosted by the static GitHub Pages site.
+`textile-fx-route-lab/` adds a local prototype with two read-only market-data panels: Textile FX previews on Celo and a Jupiter quote-only USDC→USDT panel on Solana. Neither panel connects a wallet, signs, trades, or settles; the Solana quote is not Textile liquidity or a cross-chain route. Run it with Node.js 18+ using `npm run demo` from that folder. The previews are indicative, not executable quotes or realized P&L, and exclude execution costs and risk. See the [Route Lab README](textile-fx-route-lab/README.md) for setup, limits, and tests. A separate `/devnet` page optionally lets the user sign one Memo Program transaction that this local app submits only to Devnet; it transfers no tokens, requires Devnet test SOL for the network fee, and writes a permanently public memo. This local demo is not hosted by the static GitHub Pages site.
 
 ## Run it locally
 

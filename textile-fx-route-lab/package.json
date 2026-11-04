@@ -6,6 +6,14 @@
   "scripts": {
     "demo": "node server.mjs",
     "scan": "node scan.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "build:devnet": "esbuild devnet-app.mjs --bundle --minify --format=iife --platform=browser --target=es2020 --outfile=public/devnet.js"
+  },
+  "devDependencies": {
+    "@solana/web3.js": "1.98.4",
+    "esbuild": "0.25.5"
+  },
+  "dependencies": {
+    "buffer": "6.0.3"
   }
 }
