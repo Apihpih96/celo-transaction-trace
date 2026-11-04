@@ -96,3 +96,49 @@ form.addEventListener("submit", async (event) => {
 // Load a real read-only preview on first open; never use a fabricated sample.
 initialRetryLeft = 1;
 form.requestSubmit();
+
+
+// Separate Solana quote-only path. It makes one request only when the user asks.
+const solanaForm = document.querySelector("#solana-form");
+const solanaAmount = document.querySelector("#solana-amount");
+const solanaButton = document.querySelector("#solana-button");
+const solanaLoading = document.querySelector("#solana-loading");
+const solanaError = document.querySelector("#solana-error");
+const solanaResult = document.querySelector("#solana-result");
+
+solanaForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const amountText = solanaAmount.value.trim();
+  if (!/^\d+(?:\.\d{1,6})?$/.test(amountText) || Number(amountText) < 0.01 || Number(amountText) > 1000) {
+    solanaError.textContent = "Enter an amount from 0.01 to 1,000 USDC, with up to 6 decimal places.";
+    solanaError.hidden = false;
+    solanaResult.hidden = true;
+    return;
+  }
+  solanaButton.disabled = true;
+  solanaButton.querySelector("span:first-child").textContent = "Checking…";
+  solanaLoading.hidden = false;
+  solanaError.hidden = true;
+  solanaResult.hidden = true;
+  try {
+    const response = await fetch(`/api/solana-quote?amount=${encodeURIComponent(amountText)}`, { cache: "no-store" });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Jupiter quote unavailable.");
+    if (data.transaction !== null || data.quoteOnly !== true) throw new Error("The response was not quote-only; no transaction was used.");
+    document.querySelector("#solana-result-title").textContent = `${money.format(safeNumber(data.inputAmount))} USDC → ${money.format(safeNumber(data.outputAmount))} USDT`;
+    document.querySelector("#solana-router").textContent = data.router;
+    document.querySelector("#solana-fee").textContent = data.feeBps === null ? "Not supplied" : `${data.feeBps} bps`;
+    document.querySelector("#solana-impact").textContent = data.priceImpactPct === null ? "Not supplied" : `${data.priceImpactPct}%`;
+    document.querySelector("#solana-slot").textContent = String(data.mintRpcSlot);
+    document.querySelector("#solana-sampled-time").textContent = `sampled ${new Date(data.sampledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+    document.querySelector("#solana-disclaimer").textContent = data.disclaimer;
+    solanaResult.hidden = false;
+  } catch (error) {
+    solanaError.textContent = `${error.message} Nothing was signed or sent.`;
+    solanaError.hidden = false;
+  } finally {
+    solanaLoading.hidden = true;
+    solanaButton.disabled = false;
+    solanaButton.querySelector("span:first-child").textContent = "Fetch quote";
+  }
+});
