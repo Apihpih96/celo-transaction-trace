@@ -4,15 +4,45 @@ A small, dependency-free browser tool for inspecting pasted Celo transaction-rec
 
 ## Hosted demo
 
-The public demo is live at <https://apihpih96.github.io/celo-transaction-trace/> (checked 2026-11-02).
+The public demo is live at <https://apihpih96.github.io/celo-transaction-trace/> (HTTP 200 checked 2026-11-07).
 
 ## Textile FX Route Lab
 
 `textile-fx-route-lab/` adds a separate, read-only Celo FX preview demo. It reads public Textile corridor levels and requests two free indicative previews; it has no wallet, signer, trade, or settlement path. It runs locally with Node.js 18+ using `npm run demo` from that folder. The estimates are not executable quotes or realized P&L and exclude gas and execution risk. See the [Route Lab README](textile-fx-route-lab/README.md) for setup, limits, and tests. The demo source is public, but it is not hosted by the static GitHub Pages site.
 
-## Run it locally
+## How to run
 
-Open `index.html` in a browser. No build step, account, API key, backend, network lookup, or transaction signing is required. The built-in example loads a verified Celo mainnet swap and demonstrates decoding six selected `Transfer` logs.
+### Browser decoder — offline example, no secrets
+
+From the repository root, start a local static server:
+
+```sh
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+Open <http://127.0.0.1:8000/> and click **Load and decode example**. It serves the bundled example locally; no environment variables, API keys, wallet, backend, or network lookup are needed. Stop with Ctrl+C. You can also open `index.html` directly.
+
+### Textile FX Route Lab — live read-only previews
+
+Requires Node.js 18+. From the repository root:
+
+```sh
+cd textile-fx-route-lab
+npm run demo
+```
+
+Open <http://127.0.0.1:4173/>. No API key, environment variable, or `npm install` is needed; this demo makes live public indicative-preview requests to Textile, so it is not an offline mock. Stop with Ctrl+C. See the [Route Lab README](textile-fx-route-lab/README.md) for details and tests.
+
+### Celo Sepolia x402 API — unpaid startup check
+
+Requires Node.js 20+ and pnpm 9+. In `sepolia-demo/`, copy `.env.example` to `.env` and set `X402_PAY_TO` to a Celo Sepolia address you control, then run:
+
+```sh
+pnpm install
+pnpm dev
+```
+
+The server listens on `PORT` (default `3001`). In a second terminal, run `pnpm check:402`; this unpaid check needs no `X402_API_KEY`, buyer key, or payment. `pnpm buy` is a separate paid test and is not part of the quick start. See the [x402 demo README](sepolia-demo/README.md) before using it.
 
 ## Current scope
 
@@ -26,6 +56,8 @@ Open `index.html` in a browser. No build step, account, API key, backend, networ
 `agent.json` is the public profile for this project. It now includes the ERC-8004 registration metadata for agent ID `10016` on Celo Mainnet (`eip155:42220`), owned by the registering Valora wallet. The registration used the profile URI in this file and the event attribution tag below.
 
 The registration succeeded in block `81660684` at `2026-11-01 19:30:42 UTC`. Its transaction is [`0x8710ecd6854c8c5163dd8ffee0318bd77fe5a997eb4b37e1dd8a3650077312b6`](https://celo.blockscout.com/tx/0x8710ecd6854c8c5163dd8ffee0318bd77fe5a997eb4b37e1dd8a3650077312b6); actual network fee was approximately `0.040284 CELO`.
+
+The ERC-8004 Identity Registry contract is [`0x8004A169FB4a3325136EB29fA0ceB6D2e539a432`](https://celo.blockscout.com/address/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432) on Celo Mainnet.
 
 ## Hackathon attribution
 
