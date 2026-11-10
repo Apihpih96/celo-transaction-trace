@@ -1,10 +1,16 @@
 # Celo Transaction Trace
 
-A small, dependency-free browser tool for inspecting pasted Celo transaction-receipt JSON. It validates a transaction hash, links to the corresponding Blockscout page, and locally decodes receipt metadata and ERC-20 `Transfer` events.
+A small browser tool for inspecting pasted Celo transaction-receipt JSON and reading confirmed Solana Devnet transactions. The Celo receipt decoder stays local; the Solana explainer reads public Devnet RPC data and links to the Devnet Explorer.
 
 ## Hosted demo
 
 The public demo is live at <https://apihpih96.github.io/celo-transaction-trace/> (HTTP 200 checked 2026-11-07).
+
+## Solana Devnet transaction explainer
+
+The main page includes a read-only Solana Devnet explainer. Paste a base58 transaction signature to fetch its confirmed transaction from the public `api.devnet.solana.com` RPC, then inspect top-level and inner program calls, token-account balance changes (calculated from raw amounts and each mint’s decimals), the network fee in SOL, and a link to Solana Explorer with Devnet selected. A public transaction is prefilled as an example; the sample was fetched successfully from Devnet on 2026-11-10 (slot `520776267`, fee `5000` lamports, six token-account balance changes). The example is community Devnet data, not a transaction by this project.
+
+This feature does not request a wallet, reveal or store keys, sign or send transactions, or call a paid provider. It displays token-account balance deltas rather than assigning token names or asserting intent; mint addresses remain the identifiers. RPC availability and historical Devnet retention are controlled by the public provider. Run parser and request-shape tests with `node --test tests/solana-devnet.test.mjs` (Node.js 18+).
 
 ## Textile FX Route Lab
 
@@ -49,7 +55,7 @@ The server listens on `PORT` (default `3001`). In a second terminal, run `pnpm c
 - Accepts a transaction receipt as JSON and decodes its status, block number, gas used, transaction hash, log count, and ERC-20 transfer addresses/raw values.
 - Includes a real Celo mainnet example: [`0x3cf7830fb32b72878c49613de423639414e18ba92fa148bbbce6d83461cf9260`](https://celo.blockscout.com/tx/0x3cf7830fb32b72878c49613de423639414e18ba92fa148bbbce6d83461cf9260).
 - The bundled example is a selected-log excerpt, not the complete receipt. Token values remain raw units because token decimals are not included.
-- The static browser decoder is offline: it does not fetch receipts, call Chainstack or another paid service, send transactions, or provide wallet functionality. The separate x402 receipt API is hosted under `sepolia-demo/` and serves Celo Sepolia only.
+- The Celo receipt decoder is offline and does not fetch receipts. The Solana Devnet explainer makes one read-only public RPC lookup when requested. Neither feature sends a transaction or provides wallet functionality. The separate x402 receipt API is hosted under `sepolia-demo/` and serves Celo Sepolia only.
 
 ## ERC-8004 identity
 
