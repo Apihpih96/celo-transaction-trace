@@ -8,6 +8,7 @@ import {
   WalletConnectMethod,
   moduleSchemaFromBase64,
 } from "@concordium/wallet-connectors";
+import { setWalletConnectionControls } from "./registration-ui.mjs";
 import {
   AccountTransactionType,
   CcdAmount,
@@ -110,8 +111,7 @@ async function connectWallet() {
     if (connection.chainId !== "ccd:testnet") throw new Error("Wrong network. Connect a Concordium Testnet account; no transaction was requested.");
     const account = connection.getConnectedAccount();
     if (account !== info.account) throw new Error("Wrong account connected. No transaction was requested; disconnect and choose the account shown above.");
-    requestButton.classList.remove("hidden");
-    disconnectButton.classList.remove("hidden");
+    setWalletConnectionControls(requestButton, disconnectButton, true);
     setStatus("Correct Testnet account connected. Review the details above, then request the wallet review.", "ok");
   } catch (error) {
     connection = undefined;
@@ -174,8 +174,7 @@ async function disconnectWallet() {
   try { await connection?.disconnect(); } catch {}
   connection = undefined;
   connector = undefined;
-  requestButton.classList.add("hidden");
-  disconnectButton.classList.add("hidden");
+  setWalletConnectionControls(requestButton, disconnectButton, false);
   connectButton.disabled = false;
   setStatus("Wallet disconnected. No transaction was requested.");
 }
