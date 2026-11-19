@@ -16,6 +16,10 @@ This feature does not request a wallet, reveal or store keys, sign or send trans
 
 `textile-fx-route-lab/` adds a separate, read-only Celo FX preview demo. It reads public Textile corridor levels and requests two free indicative previews; it has no wallet, signer, trade, or settlement path. It runs locally with Node.js 18+ using `npm run demo` from that folder. The estimates are not executable quotes or realized P&L and exclude gas and execution risk. See the [Route Lab README](textile-fx-route-lab/README.md) for setup, limits, and tests. The demo source is public, but it is not hosted by the static GitHub Pages site.
 
+## Local agent wrapper prototype
+
+`agent-wrapper/` adds a separate, read-only HTTP service around the existing receipt parser and Concordium’s hosted testnet registry MCP. It runs locally or as a hosted service, with a service card, receipt-analysis endpoint, live testnet status endpoint, and supplied-badge verification endpoint. Its card explicitly has no Concordium registration; no wallet, signing, transaction, or payment flow was added. See [agent-wrapper/README.md](agent-wrapper/README.md) for its routes and commands.
+
 ## How to run
 
 ### Browser decoder — offline example, no secrets
