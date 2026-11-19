@@ -3,9 +3,12 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { analyzeReceipt } from "./receipt.mjs";
 import { getTestnetStatus, verifyTestnetBadge } from "./concordium.mjs";
+import { buildRegistrationInfo, WALLETCONNECT_PROJECT_ID } from "./registration.mjs";
 
 const MAX_BODY_BYTES = 256 * 1024;
 const concordiumAgentCard = readFileSync(new URL("./concordium-agent-card.json", import.meta.url), "utf8");
+const registrationPage = readFileSync(new URL("../public/register.html", import.meta.url), "utf8");
+const registrationBundlePath = new URL("../public/register-client.bundle.js", import.meta.url);
 
 function publicOrigin(req) {
   const configured = process.env.PUBLIC_BASE_URL || process.env.RENDER_EXTERNAL_URL;
@@ -28,6 +31,17 @@ function json(res, status, value) {
   res.end(JSON.stringify(value));
 }
 
+function text(res, status, contentType, body) {
+  res.writeHead(status, {
+    "content-type": contentType,
+    "cache-control": "no-store",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "no-referrer",
+    "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: wss:; img-src 'self' data: https:; frame-src https:; font-src 'self' data: https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+  });
+  res.end(body);
+}
+
 async function readJson(req) {
   const chunks = [];
   let bytes = 0;
@@ -46,6 +60,21 @@ export function createAgentServer({ fetchImpl = fetch } = {}) {
     try {
       if (req.method === "GET" && url.pathname === "/healthz") {
         return json(res, 200, { ok: true, service: "Celo Transaction Trace agent wrapper", mode: "read-only" });
+      }
+      if (req.method === "GET" && url.pathname === "/register") {
+        return text(res, 200, "text/html; charset=utf-8", registrationPage);
+      }
+      if (req.method === "GET" && url.pathname === "/register-client.bundle.js") {
+        let bundle;
+        try { bundle = readFileSync(registrationBundlePath); }
+        catch { return json(res, 503, { error: "Registration helper is not built." }); }
+        return text(res, 200, "text/javascript; charset=utf-8", bundle);
+      }
+      if (req.method === "GET" && url.pathname === "/api/concordium/register-info") {
+        return json(res, 200, {
+          ...buildRegistrationInfo(),
+          walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID,
+        });
       }
       if (req.method === "GET" && url.pathname === "/agent-card.json") {
         const origin = publicOrigin(req);

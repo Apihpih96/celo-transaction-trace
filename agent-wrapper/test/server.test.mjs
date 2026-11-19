@@ -72,3 +72,27 @@ test("validates receipt bodies and bounds request size", async () => {
     assert.equal(huge.status, 413);
   });
 });
+
+
+test("serves the guarded registration helper and its exact prepared transaction details", async () => {
+  await withServer(async (base) => {
+    const page = await fetch(`${base}/register`);
+    const pageText = await page.text();
+    assert.equal(page.status, 200);
+    assert.match(page.headers.get("content-security-policy"), /script-src 'self'/);
+    assert.match(pageText, /Nothing is signed automatically/);
+    assert.match(pageText, /Request wallet transaction review/);
+    const bundle = await fetch(`${base}/register-client.bundle.js`);
+    const bundleText = await bundle.text();
+    assert.equal(bundle.status, 200);
+    assert.equal(bundle.headers.get("content-type"), "text/javascript; charset=utf-8");
+    assert.match(bundleText, /sign_and_send_transaction/);
+    const infoResponse = await fetch(`${base}/api/concordium/register-info`);
+    const info = await infoResponse.json();
+    assert.equal(info.network, "testnet");
+    assert.equal(info.contract.index, 12802);
+    assert.equal(info.account, "3oVHGTC3r3yFiRprS1t6YZiMnarV96CVbGw6xDPg2FisWav27M");
+    assert.equal(info.cardSha256, "4f15abfc8a6e0e015a816a350eeb7559af27797a7865ee5797c2c8a5e7cbb8dd");
+    assert.ok(info.parameterHex.includes(info.cardSha256));
+  });
+});

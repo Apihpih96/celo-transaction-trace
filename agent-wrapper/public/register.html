@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101820">
+  <title>Concordium Testnet Registration Check</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101820;--panel:#18232d;--line:#344653;--text:#f3f6f8;--muted:#b4c0c8;--blue:#82b4ff;--warn:#ffd98a;--green:#a6e8c0;--red:#ffaaa8}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+    main{width:min(100% - 28px,640px);margin:24px auto 48px}h1{font-size:1.45rem;line-height:1.2;margin:0 0 8px}p{margin:8px 0;color:var(--muted)}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}.notice{border-left:4px solid var(--warn)}
+    .label{color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.07em}.value{overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9rem}
+    .grid{display:grid;grid-template-columns:110px 1fr;gap:10px 12px;align-items:start;margin-top:12px}.grid .label{text-transform:none;letter-spacing:0}
+    button{width:100%;border:0;border-radius:12px;padding:14px 16px;background:#2563eb;color:white;font-size:1rem;font-weight:700;margin-top:12px}button:disabled{opacity:.5}
+    .secondary{background:#293946;border:1px solid var(--line)}.status{min-height:26px;color:var(--blue);font-weight:600}.ok{color:var(--green)}.bad{color:var(--red)}
+    code{overflow-wrap:anywhere;color:#d8e8ff}.hidden{display:none!important}small{color:var(--muted)}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Concordium Testnet registration</h1>
+  <p>This is a transaction-review helper for the Celo Transaction Trace agent card.</p>
+  <section class="panel notice">
+    <strong>Nothing is signed automatically.</strong>
+    <p>Connecting only links your wallet. A separate button will request the wallet transaction review. The transaction submits only if you approve it in your wallet.</p>
+    <p>It is Testnet only and sends 0 CCD. The last wallet review estimated a 217.756912 CCD fee; that can change. Check the live fee and transaction details, and cancel if anything differs or you’re unsure.</p>
+  </section>
+  <section class="panel">
+    <div class="label">Prepared transaction</div>
+    <div class="grid">
+      <div class="label">Network</div><div class="value">Concordium Testnet</div>
+      <div class="label">Sender</div><div class="value" id="account">Loading…</div>
+      <div class="label">Contract</div><div class="value">12802.0 · CIS-8004.register</div>
+      <div class="label">Amount</div><div class="value">0 CCD</div>
+      <div class="label">Card URL</div><div class="value" id="card-url">—</div>
+      <div class="label">Card SHA-256</div><div class="value" id="card-hash">—</div>
+      <div class="label">Max energy</div><div class="value">30,000</div>
+    </div>
+    <p><small>Before approving, compare the wallet’s displayed call and fee with this page. The card hash above must match the transaction’s metadata hash in the wallet details.</small></p>
+  </section>
+  <div id="status" class="status" role="status" aria-live="polite">Checking the live card and prepared payload…</div>
+  <button id="connect" disabled>Connect Concordium Wallet</button>
+  <button id="request" class="secondary hidden" disabled>Request wallet transaction review</button>
+  <button id="disconnect" class="secondary hidden">Disconnect wallet</button>
+  <p id="tx-result" class="value hidden"></p>
+  <p><small>If this page says the card or payload does not match, it will not request a wallet transaction.</small></p>
+</main>
+<script type="module" src="/register-client.bundle.js"></script>
+</body>
+</html>

@@ -5,9 +5,17 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.mjs",
+    "build:register": "node ./node_modules/esbuild/bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
+    "pretest": "node ./node_modules/esbuild/bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
+    "prestart": "node ./node_modules/esbuild/bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
     "test": "node --test"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@concordium/wallet-connectors": "0.9.0",
+    "@concordium/web-sdk": "12.0.3",
+    "esbuild": "0.28.2"
   }
 }
