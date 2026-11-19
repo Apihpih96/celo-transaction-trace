@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.mjs",
-    "build:register": "node ./node_modules/esbuild/bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
+    "build:register": "./node_modules/.bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
     "pretest": "npm install --include=dev --no-audit --no-fund && npm run build:register",
-    "prestart": "node ./node_modules/esbuild/bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
+    "prestart": "./node_modules/.bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
     "test": "node --test"
   },
   "engines": {
