@@ -1,9 +1,11 @@
 import { createServer } from "node:http";
+import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { analyzeReceipt } from "./receipt.mjs";
 import { getTestnetStatus, verifyTestnetBadge } from "./concordium.mjs";
 
 const MAX_BODY_BYTES = 256 * 1024;
+const concordiumAgentCard = readFileSync(new URL("./concordium-agent-card.json", import.meta.url), "utf8");
 
 function publicOrigin(req) {
   const configured = process.env.PUBLIC_BASE_URL || process.env.RENDER_EXTERNAL_URL;
@@ -60,6 +62,14 @@ export function createAgentServer({ fetchImpl = fetch } = {}) {
           active: true,
           registrations: [],
         });
+      }
+      if (req.method === "GET" && url.pathname === "/concordium-agent-card.json") {
+        res.writeHead(200, {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store",
+          "x-content-type-options": "nosniff",
+        });
+        return res.end(concordiumAgentCard);
       }
       if (req.method === "POST" && url.pathname === "/api/analyze-receipt") {
         const body = await readJson(req);

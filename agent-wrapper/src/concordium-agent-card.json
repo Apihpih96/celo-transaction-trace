@@ -1,0 +1,72 @@
+{
+  "name": "Celo Transaction Trace Agent Wrapper (prototype)",
+  "description": "A read-only prototype that analyzes Celo receipt JSON supplied by a caller and checks Concordium testnet registry status and supplied badge addresses. It does not fetch Celo receipts, sign or submit transactions, or make payments.",
+  "url": "https://celo-agent-wrapper.onrender.com/concordium-agent-card.json",
+  "version": "1.0.0",
+  "defaultInputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "authentication": {
+    "schemes": []
+  },
+  "skills": [
+    {
+      "id": "analyze-celo-receipt",
+      "name": "Analyze supplied Celo receipt",
+      "description": "Decode status, block, gas, logs, and ERC-20 transfer addresses/raw values from receipt JSON supplied by the caller.",
+      "tags": [
+        "Celo",
+        "read-only"
+      ]
+    },
+    {
+      "id": "check-concordium-testnet-badge",
+      "name": "Check Concordium testnet badge",
+      "description": "Check a supplied Concordium testnet badge token address using the hosted read-only registry service.",
+      "tags": [
+        "Concordium",
+        "testnet",
+        "read-only"
+      ]
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "https://docs.concordium.com/a2a-extensions/concordium-badge/v1",
+        "description": "Verified by Concordium badge — on-chain agent identity in a CIS-8004 registry",
+        "required": false,
+        "params": {
+          "tokenAddress": null,
+          "owner": {
+            "account": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3oVHGTC3r3yFiRprS1t6YZiMnarV96CVbGw6xDPg2FisWav27M"
+          },
+          "agentWallet": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3oVHGTC3r3yFiRprS1t6YZiMnarV96CVbGw6xDPg2FisWav27M",
+          "contracts": {
+            "cis8004": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0",
+            "cis8": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12801.0"
+          },
+          "services": {
+            "receiptAnalysis": "https://celo-agent-wrapper.onrender.com/api/analyze-receipt",
+            "concordiumTestnetStatus": "https://celo-agent-wrapper.onrender.com/api/concordium/testnet",
+            "concordiumTestnetBadgeCheck": "https://celo-agent-wrapper.onrender.com/api/concordium/badges/{token_address}"
+          },
+          "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
+          "verification": {
+            "service": "Concordium Agent Registry",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/3oVHGTC3r3yFiRprS1t6YZiMnarV96CVbGw6xDPg2FisWav27M",
+            "mcp": "https://agent-registry-mcp.concordium.com/mcp",
+            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
+          }
+        }
+      }
+    ]
+  }
+}

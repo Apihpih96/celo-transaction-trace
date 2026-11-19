@@ -21,6 +21,23 @@ test("serves a local card that explicitly has no Concordium registration", async
   });
 });
 
+test("serves the prepared pre-mint Concordium Agent Card without changing the legacy card", async () => {
+  const { createHash } = await import("node:crypto");
+  await withServer(async (base) => {
+    const response = await fetch(`${base}/concordium-agent-card.json`);
+    const raw = await response.text();
+    const card = JSON.parse(raw);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
+    assert.equal(card.url, "https://celo-agent-wrapper.onrender.com/concordium-agent-card.json");
+    assert.equal(card.capabilities.extensions[0].params.tokenAddress, null);
+    assert.match(card.capabilities.extensions[0].params.owner.account, /^ccd:/);
+    assert.equal(createHash("sha256").update(raw).digest("hex"), "4f15abfc8a6e0e015a816a350eeb7559af27797a7865ee5797c2c8a5e7cbb8dd");
+    const legacy = await (await fetch(`${base}/agent-card.json`)).json();
+    assert.deepEqual(legacy.registrations, []);
+  });
+});
+
 test("runs HTTP receipt analysis and exposes the read-only testnet status/check routes", async () => {
   const calls = [];
   const fetchImpl = async (_url, options) => {
