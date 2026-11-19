@@ -37,7 +37,7 @@ function text(res, status, contentType, body) {
     "cache-control": "no-store",
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
-    "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: wss:; img-src 'self' data: https:; frame-src https:; font-src 'self' data: https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+    "content-security-policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: wss:; img-src 'self' data: https:; frame-src https:; font-src 'self' data: https:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
   });
   res.end(body);
 }

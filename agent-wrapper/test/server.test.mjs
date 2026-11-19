@@ -79,7 +79,8 @@ test("serves the guarded registration helper and its exact prepared transaction 
     const page = await fetch(`${base}/register`);
     const pageText = await page.text();
     assert.equal(page.status, 200);
-    assert.match(page.headers.get("content-security-policy"), /script-src 'self'/);
+    assert.match(page.headers.get("content-security-policy"), /script-src 'self' 'wasm-unsafe-eval'/);
+    assert.doesNotMatch(page.headers.get("content-security-policy"), /'unsafe-eval'(?!')/);
     assert.match(pageText, /Nothing is signed automatically/);
     assert.match(pageText, /Request wallet transaction review/);
     const bundle = await fetch(`${base}/register-client.bundle.js`);
