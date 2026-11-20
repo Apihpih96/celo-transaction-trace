@@ -21,7 +21,7 @@ test("serves a local card that explicitly has no Concordium registration", async
   });
 });
 
-test("serves the prepared pre-mint Concordium Agent Card without changing the legacy card", async () => {
+test("serves the registered Concordium Agent Card without changing the legacy card", async () => {
   const { createHash } = await import("node:crypto");
   await withServer(async (base) => {
     const response = await fetch(`${base}/concordium-agent-card.json`);
@@ -30,9 +30,10 @@ test("serves the prepared pre-mint Concordium Agent Card without changing the le
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("content-type"), "application/json; charset=utf-8");
     assert.equal(card.url, "https://celo-agent-wrapper.onrender.com/concordium-agent-card.json");
-    assert.equal(card.capabilities.extensions[0].params.tokenAddress, null);
+    assert.equal(card.capabilities.extensions[0].params.tokenAddress, "ccd:4221332d34e1694168c2a0c0b3fd0f27/cis-2:JyP9UR4v2wZp4QAadLqUB");
+    assert.deepEqual(card.registrations, [{ agentId: 1308, agentRegistry: "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0" }]);
     assert.match(card.capabilities.extensions[0].params.owner.account, /^ccd:/);
-    assert.equal(createHash("sha256").update(raw).digest("hex"), "4f15abfc8a6e0e015a816a350eeb7559af27797a7865ee5797c2c8a5e7cbb8dd");
+    assert.equal(createHash("sha256").update(raw).digest("hex"), "193f481b9085081d31cd591ee25058281d7ef37921131b965ee15f1091adbb2b");
     const legacy = await (await fetch(`${base}/agent-card.json`)).json();
     assert.deepEqual(legacy.registrations, []);
   });
@@ -93,7 +94,7 @@ test("serves the guarded registration helper and its exact prepared transaction 
     assert.equal(info.network, "testnet");
     assert.equal(info.contract.index, 12802);
     assert.equal(info.account, "3oVHGTC3r3yFiRprS1t6YZiMnarV96CVbGw6xDPg2FisWav27M");
-    assert.equal(info.cardSha256, "4f15abfc8a6e0e015a816a350eeb7559af27797a7865ee5797c2c8a5e7cbb8dd");
+    assert.equal(info.cardSha256, "193f481b9085081d31cd591ee25058281d7ef37921131b965ee15f1091adbb2b");
     assert.ok(info.parameterHex.includes(info.cardSha256));
   });
 });
