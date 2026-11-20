@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101820">
+  <title>Review Concordium agent card update</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101820;--panel:#18232d;--line:#344653;--text:#f3f6f8;--muted:#b4c0c8;--blue:#82b4ff;--warn:#ffd98a;--green:#a6e8c0;--red:#ffaaa8}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+    main{width:min(100% - 28px,680px);margin:22px auto 44px}h1{font-size:1.4rem;line-height:1.2;margin:0 0 8px}p{margin:8px 0;color:var(--muted)}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:17px;margin:14px 0}.notice{border-left:4px solid var(--warn)}
+    .label{color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.06em}.value{overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem}
+    .grid{display:grid;grid-template-columns:108px 1fr;gap:10px 12px;align-items:start;margin-top:13px}.grid .label{text-transform:none;letter-spacing:0}
+    button{width:100%;border:0;border-radius:12px;padding:14px 16px;background:#2563eb;color:white;font-size:1rem;font-weight:700;margin-top:12px}button:disabled{opacity:.5}
+    .secondary{background:#293946;border:1px solid var(--line)}.status{min-height:26px;color:var(--blue);font-weight:600}.ok{color:var(--green)}.bad{color:var(--red)}
+    .check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;color:var(--text)}.check input{margin-top:6px;accent-color:#4a8dff;width:19px;height:19px;flex:none}
+    code{overflow-wrap:anywhere;color:#d8e8ff}.hidden{display:none!important}small{color:var(--muted)}
+    @media(max-width:420px){.grid{grid-template-columns:1fr;gap:2px}.grid .label:not(:first-child){margin-top:8px}.panel{padding:15px}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Review card update</h1>
+  <p>This updates the existing Concordium agent token; it does not register another token.</p>
+  <section class="panel notice">
+    <strong>Nothing happens until you request the wallet review.</strong>
+    <p>Connecting only links your wallet. After you tap the review button, your Concordium Wallet shows the transaction. It is signed and submitted only if you approve it there.</p>
+    <p>Fee is not known in advance; the wallet calculates it for this update. Check the exact fee and call details in the wallet before approving. This is not an app to install.</p>
+  </section>
+  <section class="panel">
+    <div class="label">Prepared Testnet transaction</div>
+    <div class="grid">
+      <div class="label">Network</div><div class="value" id="network">Loading…</div>
+      <div class="label">Sender</div><div class="value" id="account">—</div>
+      <div class="label">Contract</div><div class="value" id="contract">—</div>
+      <div class="label">Entrypoint</div><div class="value" id="entrypoint">—</div>
+      <div class="label">Token</div><div class="value" id="token">—</div>
+      <div class="label">Card URL</div><div class="value" id="card-url">—</div>
+      <div class="label">Card SHA-256</div><div class="value" id="card-hash">—</div>
+      <div class="label">Amount</div><div class="value">0 CCD</div>
+      <div class="label">Energy limit</div><div class="value" id="energy">—</div>
+      <div class="label">Transaction fee</div><div class="value">Wallet-calculated; check the exact fee before approval</div>
+    </div>
+    <p><small>The page checks the hosted card bytes and the prepared contract payload before requesting wallet review.</small></p>
+  </section>
+  <label id="confirm-wrap" class="check hidden"><input id="confirm" type="checkbox"><span>I understand that approving in my wallet will submit this Testnet contract update and charge the displayed transaction fee.</span></label>
+  <div id="status" class="status" role="status" aria-live="polite">Checking the hosted card and prepared payload…</div>
+  <button id="connect" disabled>Connect Concordium Wallet</button>
+  <button id="request" class="secondary hidden" disabled>Review this update in wallet</button>
+  <button id="disconnect" class="secondary hidden">Disconnect wallet</button>
+  <p id="tx-result" class="value hidden"></p>
+  <p><small>If the wallet shows a different network, account, contract, entrypoint, token or URI, cancel.</small></p>
+</main>
+<script type="module" src="/set-agent-uri-client.bundle.js"></script>
+</body>
+</html>

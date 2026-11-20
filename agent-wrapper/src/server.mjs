@@ -4,11 +4,14 @@ import { pathToFileURL } from "node:url";
 import { analyzeReceipt } from "./receipt.mjs";
 import { getTestnetStatus, verifyTestnetBadge } from "./concordium.mjs";
 import { buildRegistrationInfo, WALLETCONNECT_PROJECT_ID } from "./registration.mjs";
+import { buildSetAgentUriInfo } from "./set-agent-uri.mjs";
 
 const MAX_BODY_BYTES = 256 * 1024;
 const concordiumAgentCard = readFileSync(new URL("./concordium-agent-card.json", import.meta.url), "utf8");
 const registrationPage = readFileSync(new URL("../public/register.html", import.meta.url), "utf8");
+const setAgentUriPage = readFileSync(new URL("../public/set-agent-uri.html", import.meta.url), "utf8");
 const registrationBundlePath = new URL("../public/register-client.bundle.js", import.meta.url);
+const setAgentUriBundlePath = new URL("../public/set-agent-uri-client.bundle.js", import.meta.url);
 
 function publicOrigin(req) {
   const configured = process.env.PUBLIC_BASE_URL || process.env.RENDER_EXTERNAL_URL;
@@ -70,9 +73,24 @@ export function createAgentServer({ fetchImpl = fetch } = {}) {
         catch { return json(res, 503, { error: "Registration helper is not built." }); }
         return text(res, 200, "text/javascript; charset=utf-8", bundle);
       }
+      if (req.method === "GET" && url.pathname === "/set-agent-uri") {
+        return text(res, 200, "text/html; charset=utf-8", setAgentUriPage);
+      }
+      if (req.method === "GET" && url.pathname === "/set-agent-uri-client.bundle.js") {
+        let bundle;
+        try { bundle = readFileSync(setAgentUriBundlePath); }
+        catch { return json(res, 503, { error: "Token update helper is not built." }); }
+        return text(res, 200, "text/javascript; charset=utf-8", bundle);
+      }
       if (req.method === "GET" && url.pathname === "/api/concordium/register-info") {
         return json(res, 200, {
           ...buildRegistrationInfo(),
+          walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID,
+        });
+      }
+      if (req.method === "GET" && url.pathname === "/api/concordium/set-agent-uri-info") {
+        return json(res, 200, {
+          ...buildSetAgentUriInfo(),
           walletConnectProjectId: process.env.WALLETCONNECT_PROJECT_ID || WALLETCONNECT_PROJECT_ID,
         });
       }

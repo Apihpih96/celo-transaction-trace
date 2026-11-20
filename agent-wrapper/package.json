@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node src/server.mjs",
     "build:register": "./node_modules/.bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
-    "pretest": "npm install --include=dev --no-audit --no-fund && npm run build:register",
-    "prestart": "./node_modules/.bin/esbuild src/register-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/register-client.bundle.js",
+    "build:set-agent-uri": "./node_modules/.bin/esbuild src/set-agent-uri-client.js --bundle --format=esm --platform=browser --target=es2022 --outfile=public/set-agent-uri-client.bundle.js",
+    "pretest": "npm install --include=dev --no-audit --no-fund && npm run build:register && npm run build:set-agent-uri",
+    "prestart": "npm run build:register && npm run build:set-agent-uri",
     "test": "node --test"
   },
   "engines": {
